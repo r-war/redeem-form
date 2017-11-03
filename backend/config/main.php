@@ -37,14 +37,18 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
+        
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'transaksi'=>'/transaksi/index',
+                'add'=>'/transaksi/add',
+                'edit'=>'/transaksi/edit',
+                'view'=>'/transaksi/view',
             ],
         ],
-        */
+        
     ],
     'params' => $params,
 ];

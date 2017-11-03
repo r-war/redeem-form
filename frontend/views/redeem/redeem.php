@@ -6,24 +6,29 @@
     
     
 ?>
-<?= $this->title='Redeem form' ?>
 
-<?php $form=  ActiveForm::begin()?>
+<?php $form=  ActiveForm::begin([
+    'id'=>'redeem-form',
+    'options'=>['class'=>'form-horizontal']])?>
 <div class="row form-group">
-    <?= $form->field($forms,'kode_voucher')->textInput()?>
+    <?= $form->field($forms,'kode_voucher')
+        //->dropDownList($voucher,['prompt'=>'mohon dipilih'])
+        ->hint('Nomor voucher berada di kanan atas di belakang voucher')?>
 </div>  
 <div class="row form-group">
-    <?= $form->field($forms,'kode_reservasi')->textInput()?>
+    <?= $form->field($forms,'kode_reservasi')
+        //->dropDownList($reservasi,['prompt'=>'mohon dipilih'])
+        ->hint('kode reservasi customer di DisTime dilihat pada aplikasi DT Merchant')?>
 </div>
 <div class="row form-group">
-    <?= $form->field($forms,'id_merchant')->dropDownList($nama,['prompt'=> 'mohon diplih'])->label('Nama Merchant')?>
+    <?= $form->field($forms,'id_merchant')->dropDownList($nama,['prompt'=> 'mohon diplih'])?>
 </div>
 <div class="row form-group">
-    <?= $form->field($forms,'tanggal')->widget(DatePicker::className(),['clientOptions' => ['dateFormat' => 'yy-mm-dd']])->label('Tanggal Transaksi') ?>
+    <?= $form->field($forms,'tanggal')->widget(DatePicker::className(),['dateFormat' => 'yyyy-MM-dd'])->label('Tanggal Transaksi') ?>
 </div>
 <div class="row form-group">
 
-        <?= $form->field($forms,'jlh_bill')->textInput()->label('Jumlah Transaksi')?>
+        <?= $form->field($forms,'jlh_bill')->hint('Dalam rupiah')?>
 
 </div>
 
@@ -31,4 +36,4 @@
     <?=    Html::submitButton('submit', ['class'=>'btn btn-primary'])?>
 </div>
  
-<?phpActiveForm::end()?>
+<?php ActiveForm::end(); ?>

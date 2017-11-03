@@ -18,7 +18,7 @@ use Yii;
  * @property Reservasi $kodeReservasi
  * @property Voucher $kodeVoucher
  */
-class Transaksi extends \yii\db\ActiveRecord
+class transaksi extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
@@ -62,10 +62,11 @@ class Transaksi extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getIdMerchant()
+    public function getMerchant()
     {
         return $this->hasOne(Merchant::className(), ['id' => 'id_merchant']);
     }
+    
 
     /**
      * @return \yii\db\ActiveQuery
