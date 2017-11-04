@@ -11,7 +11,12 @@ return [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
-    'modules' => [],
+    'modules' => [
+        'gridview'=>[
+            'class'=>'\kartik\grid\module',
+            'downloadAction'=>'export',
+        ],
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
@@ -46,6 +51,7 @@ return [
                 'add'=>'/transaksi/add',
                 'edit'=>'/transaksi/edit',
                 'view'=>'/transaksi/view',
+                'excel'=>'transaksi/excel',
             ],
         ],
         

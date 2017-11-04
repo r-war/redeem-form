@@ -73,4 +73,16 @@ class redeemForm extends Model
     public function getDateReservasi(){
         return $this->tanggal_reservasi= Reservasi::find()->select('tanggal','kode_reservasi')->where(['kode_reservasi'=>  $this->kode_reservasi])->one();
     }
+    
+    public function sendMail(){
+        $nama= Merchant::find()->select(['nama'])->where(['id'=>  $this->id_merchant])->column();
+        //var_dump($nama);exit();
+        return \yii::$app->mailer->compose()
+                //->setTo('rivaldi.leonhart@gmail.com')
+                ->setTo('esmeraldapriska89@gmail.com')
+                ->setFrom('rivwar25@gmail.com')
+                ->setSubject('Redeem voucher')
+                ->setTextBody($nama[0].' melakukan redeem dengan kode voucher '.$this->kode_voucher.' dan kode reservasi '.$this->kode_reservasi.'. Jumlah bill Rp.'.$this->jlh_bill.' pada tanggal '.$this->tanggal.' berhasil diredeem.')
+                ->send();
+    }
 }

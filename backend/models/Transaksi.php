@@ -83,4 +83,8 @@ class transaksi extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Voucher::className(), ['kode_voucher' => 'kode_voucher']);
     }
+    public function excel($params)
+    {
+
+    }
 }

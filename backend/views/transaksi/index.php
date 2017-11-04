@@ -3,9 +3,13 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
+use kartik\export\ExportMenu;
+use yii\bootstrap\Modal;
 
 $this->title='Views Redeemed Voucher';
 ?>
+<?phpkartik\grid\GridView::widget()
+        ?>
 <div class="row">
     <div class="col-md-12">
         <h1>View Redeemed Voucher </h1>
@@ -22,7 +26,12 @@ $this->title='Views Redeemed Voucher';
         ?>
     </div>
 </div>
-<div>
+
+<div style="padding: 20px">
+    <?=    Html::a('export',['/transaksi/excel'], ['class'=>'btn btn-primary'])?>
+</div>
+
+<div >
     <div class="col-md-2">
         <div class="list-group">
             <a href="<?= Url::to(['/add']) ?>" class="list-group-item">
@@ -36,6 +45,7 @@ $this->title='Views Redeemed Voucher';
             <a href="<?= Url::to(['/view']) ?>" class="list-group-item">
                 <i class="glyphicon glyphicon-edit"></i>view Voucher
             </a>
+            
         </div>
     </div>
     <div class="col-md-10">
@@ -72,5 +82,6 @@ $this->title='Views Redeemed Voucher';
                 <?php } ?>
             </tbody>
         </table>
+
     </div>
 </div>

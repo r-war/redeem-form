@@ -55,18 +55,18 @@ class RedeemController extends Controller
             $tglReservasi = Reservasi::find()
                 ->select('tanggal')->where(['kode_reservasi'=>$forms->kode_reservasi])
                 ->column();
-            //var_dump(($tglReservasi<$tglvoucher));
+            //var_dump(empty($tglvoucher));
             //exit();
-            if($tglReservasi>$tglvoucher)
-            {
-                Yii::$app->session->setFlash('error','voucher yang anda masukkan sudah expired');
-                return $this->render('redeem',['forms'=>$forms,'nama'=>$nama]);
-            }        
-            elseif(isEmpty($tglvoucher))
+            if((empty($tglvoucher)))
             {
                 Yii::$app->session->setFlash('error','voucher belum berlaku');
                 return $this->render('redeem',['forms'=>$forms,'nama'=>$nama]);
             }
+            elseif($tglReservasi>$tglvoucher)
+            {
+                Yii::$app->session->setFlash('error','voucher yang anda masukkan sudah expired');
+                return $this->render('redeem',['forms'=>$forms,'nama'=>$nama]);
+            }   
             else
             {
                 $request= Yii::$app->request;
@@ -78,8 +78,15 @@ class RedeemController extends Controller
                 $tc->jlh_bill=$request->post('redeemForm')['jlh_bill'];
                 $tc->id_merchant=$request->post('redeemForm')['id_merchant'];
                 $tc->save();
-            Yii::$app->session->setFlash('success','data berhasil disimpan');
-            return $this->redirect(Url::to(['redeem/redeem']));
+                if ($forms->sendMail(Yii::$app->params['adminEmail'])) {
+                    Yii::$app->session->setFlash('success', 'terimakasih. redeem akan diprose oleh CS');
+                } else {
+                    Yii::$app->session->setFlash('error', 'ada error saat kirim email');
+                }
+                
+                //Yii::$app->session->setFlash('success','data berhasil disimpan');
+                
+                return $this->redirect(Url::to(['redeem/redeem']));
             }
             
             //return $this->render('redeem/index');
