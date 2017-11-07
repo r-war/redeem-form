@@ -55,14 +55,14 @@ class RedeemController extends Controller
             $tglReservasi = Reservasi::find()
                 ->select('tanggal')->where(['kode_reservasi'=>$forms->kode_reservasi])
                 ->column();
-            //var_dump(empty($tglvoucher));
-            //exit();
+            //var_dump(date('Y-m-d'),$tglvoucher);
+            //var_dump(strtotime($tglvoucher[0]) < strtotime(date('Y-m-d'))); exit();
             if((empty($tglvoucher)))
             {
                 Yii::$app->session->setFlash('error','voucher belum berlaku');
                 return $this->render('redeem',['forms'=>$forms,'nama'=>$nama]);
             }
-            elseif($tglReservasi>$tglvoucher)
+            elseif(strtotime($tglvoucher[0]) < strtotime(date('Y-m-d')))
             {
                 Yii::$app->session->setFlash('error','voucher yang anda masukkan sudah expired');
                 return $this->render('redeem',['forms'=>$forms,'nama'=>$nama]);
@@ -77,11 +77,13 @@ class RedeemController extends Controller
                 $tc->kode_voucher=$request->post('redeemForm')['kode_voucher'];
                 $tc->jlh_bill=$request->post('redeemForm')['jlh_bill'];
                 $tc->id_merchant=$request->post('redeemForm')['id_merchant'];
+                voucher::updateAll(['status'=>1],['kode_voucher'=>$tc->kode_voucher]);
+                
                 $tc->save();
                 if ($forms->sendMail(Yii::$app->params['adminEmail'])) {
                     Yii::$app->session->setFlash('success', 'terimakasih. redeem akan diprose oleh CS');
                 } else {
-                    Yii::$app->session->setFlash('error', 'ada error saat kirim email');
+                    Yii::$app->session->setFlash('error', 'ada kesalahan saat mengirim email');
                 }
                 
                 //Yii::$app->session->setFlash('success','data berhasil disimpan');

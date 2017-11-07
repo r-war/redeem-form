@@ -4,6 +4,7 @@ namespace app\models;
 use yii\base\Model;
 use yii\db\mysql;
 
+
 use app\models\voucher;
 use app\models\Reservasi;
 use app\models\Merchant;
@@ -21,15 +22,16 @@ class redeemForm extends Model
     
     public function attributeLabels() {
         return [
-            'kode_voucher'=>'kode Voucher',
-            'kode_reservasi'=>'kode reservasi',
+            'kode_voucher'=>'Kode voucher',
+            'kode_reservasi'=>'Kode reservasi',
             'id_merchant'=>'Nama merchant',
-            'tanggal'=>'tanggal transaksi',
-            'jlh_bill'=>'jumlah Bill',
+            'tanggal'=>'Tanggal transaksi',
+            'jlh_bill'=>'Jumlah Bill',
         ];
     }
     public function rules() {
         return [
+            [['kode_voucher','kode_reservasi'],'required','message'=>'harap diisi'],
             ['kode_voucher', 'validateVoucher',],
             ['kode_voucher','string','max'=>50],
             ['kode_reservasi', 'validateReservasi'],
@@ -37,6 +39,7 @@ class redeemForm extends Model
             ['tanggal','required', 'message'=>'harap diisi'],['tanggal','safe'],
             ['jlh_bill','required','message'=>'harap diisi'],['tanggal','safe'],
             ['id_merchant','required','message'=>'harap diisi'],
+            //['status','integer'],
 
         ];
     }
@@ -52,6 +55,10 @@ class redeemForm extends Model
         elseif (in_array($this->kode_voucher, $duplicate)){
             return $this->addError($attribute, 'voucher sudah digunakan');
         }
+        elseif(empty($this->kode_voucher))
+        {
+            return $this->addError($attribute, 'harap diisi');
+        }
         
         
     }
@@ -62,6 +69,10 @@ class redeemForm extends Model
         if(!in_array($this->kode_reservasi, $result,true))
         {
             return $this->addError($attribute, 'kode reservasi salah');
+        }
+        elseif(empty($this->kode_reservasi))
+        {
+            return $this->addError($attribute, 'harap diisi');
         }
         
     }
@@ -78,8 +89,8 @@ class redeemForm extends Model
         $nama= Merchant::find()->select(['nama'])->where(['id'=>  $this->id_merchant])->column();
         //var_dump($nama);exit();
         return \yii::$app->mailer->compose()
-                //->setTo('rivaldi.leonhart@gmail.com')
-                ->setTo('esmeraldapriska89@gmail.com')
+                ->setTo('rivaldi.leonhart@gmail.com')
+                //->setTo('esmeraldapriska89@gmail.com')
                 ->setFrom('rivwar25@gmail.com')
                 ->setSubject('Redeem voucher')
                 ->setTextBody($nama[0].' melakukan redeem dengan kode voucher '.$this->kode_voucher.' dan kode reservasi '.$this->kode_reservasi.'. Jumlah bill Rp.'.$this->jlh_bill.' pada tanggal '.$this->tanggal.' berhasil diredeem.')

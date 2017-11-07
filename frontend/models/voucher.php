@@ -9,8 +9,11 @@ use Yii;
  *
  * @property string $kode_voucher
  * @property string $tanggal
+ * @property integer $status
+ *
+ * @property Transaksi[] $transaksis
  */
-class voucher extends \yii\db\ActiveRecord
+class Voucher extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
@@ -26,8 +29,9 @@ class voucher extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['kode_voucher', 'tanggal'], 'required'],
+            [['kode_voucher', 'status'], 'required'],
             [['tanggal'], 'safe'],
+            [['status'], 'integer'],
             [['kode_voucher'], 'string', 'max' => 50],
         ];
     }
@@ -40,6 +44,15 @@ class voucher extends \yii\db\ActiveRecord
         return [
             'kode_voucher' => 'Kode Voucher',
             'tanggal' => 'Tanggal',
+            'status' => 'Status',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTransaksis()
+    {
+        return $this->hasMany(Transaksi::className(), ['kode_voucher' => 'kode_voucher']);
     }
 }

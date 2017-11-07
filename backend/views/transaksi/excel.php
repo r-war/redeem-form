@@ -1,4 +1,6 @@
 <?php
+use app\models\transaksi;
+
 $model= transaksi::find()->all();
         $filename= 'redeem.xls';
         header("Content-type: application/vnd-ms-excel");

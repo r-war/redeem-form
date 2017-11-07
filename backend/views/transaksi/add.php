@@ -37,7 +37,7 @@ $this->title='Add Voucher';
             </a>
         </div>
     </div>
-    <div class="col-md-10">
+    <div class="col-md-8" style="padding-left: 40px">
         <?php $form= ActiveForm::begin([
         'id'=>'add-voucher',
         'options'=>['class'=>'form-horizontal']])?>

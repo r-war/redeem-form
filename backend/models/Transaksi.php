@@ -23,6 +23,18 @@ class transaksi extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+    public $global;
+    
+    public function search($params){
+        $query= voucher::find();
+        $dataProvider= new \yii\data\ActiveDataProvider([
+            'query'=>$query,
+        ]);
+        
+        $query->orFilterWhere(['like','kode_voucher', $this->global])
+                ->orFilterWhere(['like','tanggal', $this->global]);
+        return $dataProvider;
+    }
     public static function tableName()
     {
         return 'transaksi';
@@ -34,13 +46,13 @@ class transaksi extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tanggal', 'jlh_bill', 'id_merchant', 'kode_voucher', 'kode_reservasi'], 'required'],
+            [['tanggal', 'jlh_bill', 'id_merchant','id_voucher', 'kode_voucher', 'kode_reservasi'], 'required'],
             [['tanggal'], 'safe'],
-            [['jlh_bill', 'id_merchant'], 'integer'],
-            [['kode_voucher', 'kode_reservasi'], 'string', 'max' => 50],
+            [['jlh_bill', 'id_merchant','id_voucher'], 'integer'],
+            [['kode_reservasi'], 'string', 'max' => 50],
             [['id_merchant'], 'exist', 'skipOnError' => true, 'targetClass' => Merchant::className(), 'targetAttribute' => ['id_merchant' => 'id']],
             [['kode_reservasi'], 'exist', 'skipOnError' => true, 'targetClass' => Reservasi::className(), 'targetAttribute' => ['kode_reservasi' => 'kode_reservasi']],
-            [['kode_voucher'], 'exist', 'skipOnError' => true, 'targetClass' => Voucher::className(), 'targetAttribute' => ['kode_voucher' => 'kode_voucher']],
+            [['id_voucher'], 'exist', 'skipOnError' => true, 'targetClass' => Voucher::className(), 'targetAttribute' => ['id_voucher' => 'id']],
         ];
     }
 
@@ -53,8 +65,8 @@ class transaksi extends \yii\db\ActiveRecord
             'id' => 'ID',
             'tanggal' => 'Tanggal',
             'jlh_bill' => 'Jumlah Bill',
-            'id_merchant' => 'Id Merchant',
-            'kode_voucher' => 'Kode Voucher',
+            'id_merchant' => 'Nama Merchant',
+            'id_voucher' => 'Kode Voucher',
             'kode_reservasi' => 'Kode Reservasi',
         ];
     }
@@ -79,7 +91,7 @@ class transaksi extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getKodeVoucher()
+    public function getVoucher()
     {
         return $this->hasOne(Voucher::className(), ['kode_voucher' => 'kode_voucher']);
     }

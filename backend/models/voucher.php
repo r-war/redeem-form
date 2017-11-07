@@ -17,6 +17,20 @@ class voucher extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+    public $global;
+    public $import;
+    public function search($params){
+        $query= voucher::find();
+        $dataProvider= new \yii\data\ActiveDataProvider([
+            'query'=>$query,
+        ]);
+        
+        $query->orFilterWhere(['like','kode_voucher', $this->global])
+                ->orFilterWhere(['like','tanggal', $this->global]);
+        return $dataProvider;
+    }
+    
+
     public static function tableName()
     {
         return 'voucher';
@@ -25,6 +39,8 @@ class voucher extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+    
+    
     public function rules()
     {
         return [
@@ -32,6 +48,8 @@ class voucher extends \yii\db\ActiveRecord
             [['tanggal'], 'required'],
             [['tanggal'], 'safe'],
             [['kode_voucher'], 'string', 'max' => 50],
+            ['global','safe'],
+            ['import','file','extensions'=>['csv','xls','xlsx']],
         ];
     }
 
@@ -57,8 +75,9 @@ class voucher extends \yii\db\ActiveRecord
         }
         
     }
-    public function getTransaksis()
+    public function getTransaksi()
     {
         return $this->hasMany(Transaksi::className(), ['kode_voucher' => 'kode_voucher']);
     }
+    
 }

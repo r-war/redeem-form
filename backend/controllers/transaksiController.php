@@ -3,154 +3,124 @@
 namespace backend\controllers;
 
 use Yii;
-use yii\widgets\ActiveForm;
+use app\models\Transaksi;
+use app\models\transaksiSearch;
 use yii\web\Controller;
-use yii\helpers\Url;
-use yii\filters\AccessControl;
+use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
 
-use app\models\transaksi;
-use app\models\Merchant;
-use app\models\voucher;
-use app\models\Reservasi;
-
-class TransaksiController extends \yii\web\Controller
+/**
+ * TransaksiController implements the CRUD actions for Transaksi model.
+ */
+class TransaksiController extends Controller
 {
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-        ];
-    }
-
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['index',],
-                'rules' => [
-                    [
-                        'actions' => ['index',],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['POST'],
                 ],
             ],
         ];
     }
+
+    /**
+     * Lists all Transaksi models.
+     * @return mixed
+     */
     public function actionIndex()
     {
-        $query= transaksi::find();
-        $forms= new transaksi();
-        $tc=$query->orderBy('id')->all();
-        if($forms->load(Yii::$app->request->post())){
-            return $this->actionExcel();
-        }
-        else {
-            return $this->render('index',['tc'=>$tc]);
-        }
-        
-        //if($forms)
-    }
-    public function actionExcel()
-    {
-        $model= transaksi::find()->all();
-        $filename= 'redeem.xls';
-        header("Content-type: application/vnd-ms-excel");
-        header("Content-Disposition: attachment; filename=".$filename);
-        echo '<table border="1" width="100%">
-        <thead>
-            <tr>
-                <th>id</th>
-                <th>Merchant</th>
-                <th>kode voucher</th>
-                <th>kode reservasi</th>
-                <th>tanggal</th>
-                <th>jumlah bill</th>
-            </tr>
-        </thead>';
-        foreach($model as $data){
-            echo '
-                <tr>
-                    <td>'.$data['id'].'</td>
-                    <td>'.$data->merchant['nama'].'</td>
-                    <td>'.$data['kode_voucher'].'</td>
-                    <td>'.$data['kode_reservasi'].'</td>
-                    <td>'.$data['tanggal'].'</td>
-                    <td>'.$data['jlh_bill'].'</td>
-                </tr>
-            ';
-        }
-    echo '</table>';
-    }
-    public function actionAdd()
-    {
-        $forms= new voucher();$duplicate= voucher::find()->select('kode_voucher')->column();
-        
-        if($forms->load(Yii::$app->request->post()) && $forms->validate())
-        {
-            $request= \Yii::$app->request;
-            /*if (!$forms->save()) 
-                print_r($forms->getErrors()); // this would be helpful to find problem.
-            else 
-                Yii::$app->getSession()->setFlash('success', 'Your message has been successfully recorded.');
-            */
-            if (in_array($forms->kode_voucher, $duplicate))
-            {
-                Yii::$app->session->setFlash('error', 'voucher sudah ada');
-                return $this->render('add',['forms'=>$forms]);
-            }
-            else{
-                $forms->kode_voucher= $request->post('voucher')['kode_voucher'];
-                $forms->tanggal=$request->post('voucher')['tanggal'];
-                $forms->save();
-                //var_dump($request); exit();
-                Yii::$app->session->setFlash('success','voucher berhasil ditambahkan');
-                return $this->redirect(Url::to(['index']));
-            }
-        }
-        
-        else{
-            return $this->render('add',['forms'=>$forms]);
-        }
-        
-        
-    }
-    
-    public function actionEdit($id)
-    {
-        $forms= new voucher();
-        if ($forms->load(Yii::$app->request->post()) && $forms->validate())
-        {
-            $request = Yii::$app->request;
+        $searchModel = new transaksiSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-            $tc = voucher::findOne(['kode_voucher', $id]);
-            $tc->kode_voucher = $request->post('voucher')['kode_voucher'];
-            $tc->tanggal = $request->post('voucher')['tanggal'];
-            $tc->save();
-            Yii::$app->session->setFlash('success','voucher berhasil diubah');
-            return $this->redirect(Url::to(['view', 'id'=>$id]));
-        }
-        else 
-        {
-            $tc = voucher::findOne(['kode_voucher', $id]);
-            return $this->render('edit', ['forms'=>$forms, 'tc'=>$tc]);
-        }
-        
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
-    
-    public function actionView()
-    {
-        $query= voucher::find();
-        $tc=$query->orderBy('kode_voucher')->all();
-        return $this->render('view',['tc'=>$tc]);
+    public function actionExcel(){
+        return $this->render('excel');
     }
-    
-    public function actionExport()
+    /**
+     * Displays a single Transaksi model.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionView($id)
     {
-        
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
     }
 
+    /**
+     * Creates a new Transaksi model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $model = new Transaksi();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Updates an existing Transaksi model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index', 'id' => $model->id]);
+        } else {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Deletes an existing Transaksi model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Finds the Transaksi model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Transaksi the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Transaksi::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
 }
